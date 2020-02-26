@@ -93,3 +93,6 @@ require 'pipedrive/note'
 
 # Users
 require 'pipedrive/user'
+
+# Pipeline
+require 'pipedrive/pipeline'
