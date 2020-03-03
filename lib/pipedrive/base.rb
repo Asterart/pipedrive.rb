@@ -25,6 +25,30 @@ module Pipedrive
       process_response(res)
     end
 
+    def make_api_call_for_stages(*args, id)
+      params = args.extract_options!
+      method = args[0]
+      fail 'method param missing' unless method.present?
+      url = build_url_for_stages(id)
+      begin
+        res = connection.__send__(method.to_sym, url)
+      rescue Errno::ETIMEDOUT
+        retry
+      rescue Faraday::ParsingError
+        sleep 5
+        retry
+      end
+      process_response(res)
+    end
+
+    def build_url_for_stages(id)
+      url = "/v1/#{entity_name}"
+      url << "?pipeline_id=#{id}" if id
+      url << "&api_token=#{@api_token}"
+      url
+    end
+
+
     def build_url(args, fields_to_select = nil, subfolder = nil)
       url = "/v1/#{entity_name}"
       url << "/#{args[1]}" if args[1]
