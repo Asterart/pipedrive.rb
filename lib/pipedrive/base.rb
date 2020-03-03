@@ -25,7 +25,7 @@ module Pipedrive
       process_response(res)
     end
 
-    def build_url(args, fields_to_select = nil), subfolder = nil)
+    def build_url(args, fields_to_select = nil, subfolder = nil)
       url = "/v1/#{entity_name}"
       url << "/#{args[1]}" if args[1]
       if fields_to_select.is_a?(::Array) && fields_to_select.size > 0
