@@ -9,11 +9,11 @@ module Pipedrive
       self.class.connection.dup
     end
 
-    def make_api_call(*args)
+    def make_api_call(*args, subfolder)
       params = args.extract_options!
       method = args[0]
       fail 'method param missing' unless method.present?
-      url = build_url(args, params.delete(:fields_to_select))
+      url = build_url(args, params.delete(:fields_to_select), subfolder)
       begin
         res = connection.__send__(method.to_sym, url, params)
       rescue Errno::ETIMEDOUT
@@ -25,12 +25,13 @@ module Pipedrive
       process_response(res)
     end
 
-    def build_url(args, fields_to_select = nil)
+    def build_url(args, fields_to_select = nil), subfolder = nil)
       url = "/v1/#{entity_name}"
       url << "/#{args[1]}" if args[1]
       if fields_to_select.is_a?(::Array) && fields_to_select.size > 0
         url << ":(#{fields_to_select.join(',')})"
       end
+      url << "/#{subfolder}" if subfolder
       url << "?api_token=#{@api_token}"
       url
     end

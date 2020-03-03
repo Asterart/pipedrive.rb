@@ -15,8 +15,8 @@ module Pipedrive
         each(params).to_a
       end
 
-      def chunk(params = {})
-        res = make_api_call(:get, params)
+      def chunk(params = {}, subfolder)
+        res = make_api_call(:get, params, subfolder)
         return [] unless res.success?
         res
       end
