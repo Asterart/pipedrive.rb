@@ -9,11 +9,11 @@ module Pipedrive
       self.class.connection.dup
     end
 
-    def make_api_call(*args, subfolder)
+    def make_api_call(*args)
       params = args.extract_options!
       method = args[0]
       fail 'method param missing' unless method.present?
-      url = build_url(args, params.delete(:fields_to_select), subfolder)
+      url = build_url(args, params.delete(:fields_to_select))
       begin
         res = connection.__send__(method.to_sym, url, params)
       rescue Errno::ETIMEDOUT
@@ -41,6 +41,19 @@ module Pipedrive
       process_response(res)
     end
 
+    def make_api_call_for_deals(id)
+      url = build_url_for_deals(id)
+      begin
+        res = connection.__send__(:get, url)
+      rescue Errno::ETIMEDOUT
+        retry
+      rescue Faraday::ParsingError
+        sleep 5
+        retry
+      end
+      process_response(res)
+    end
+
     def build_url_for_stages(id)
       url = "/v1/#{entity_name}"
       url << "?pipeline_id=#{id}" if id
@@ -48,14 +61,18 @@ module Pipedrive
       url
     end
 
+    def build_url_for_deals(id)
+      url = "/v1/#{entity_name}/#{id}/deals"
+      url << "?api_token=#{@api_token}"
+      url
+    end
 
-    def build_url(args, fields_to_select = nil, subfolder = nil)
+    def build_url(args, fields_to_select = nil)
       url = "/v1/#{entity_name}"
       url << "/#{args[1]}" if args[1]
       if fields_to_select.is_a?(::Array) && fields_to_select.size > 0
         url << ":(#{fields_to_select.join(',')})"
       end
-      url << "/#{subfolder}" if subfolder
       url << "?api_token=#{@api_token}"
       url
     end

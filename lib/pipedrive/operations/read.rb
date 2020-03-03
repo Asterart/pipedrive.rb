@@ -24,10 +24,6 @@ module Pipedrive
       def find_by_id(id)
         make_api_call(:get, id)
       end
-
-      def find_by_id_and_subfolder(id, subfolder)
-        make_api_call(:get, id, subfolder)
-      end
     end
   end
 end
