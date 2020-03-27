@@ -54,6 +54,27 @@ module Pipedrive
       process_response(res)
     end
 
+    def make_api_call_for_find_by(email)
+      url = build_url_for_find(email)
+      begin
+        res = connection.__send__(:get, url)
+      rescue Errno::ETIMEDOUT
+        retry
+      rescue Faraday::ParsingError
+        sleep 5
+        retry
+      end
+      process_response(res)
+    end
+
+    def build_url_for_find(email)
+      url = "/v1/#{entity_name}/find"
+      url << "?term=#{email}"
+      url << "&start=0&search_by_email=1"
+      url << "&api_token=#{@api_token}"
+      url
+    end
+
     def build_url_for_stages(id)
       url = "/v1/#{entity_name}"
       url << "?pipeline_id=#{id}" if id

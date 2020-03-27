@@ -14,5 +14,9 @@ module Pipedrive
       return to_enum(:find_by_name, params) unless block_given?
       follow_pagination(:make_api_call, [:get, 'find'], params) { |item| yield item }
     end
+
+    def find_by_email(email)
+      make_api_call_for_find_by(email)
+    end
   end
 end
